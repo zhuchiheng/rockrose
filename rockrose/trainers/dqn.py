@@ -7,7 +7,7 @@ import random
 
 import numpy as np
 
-import base as rr_trainer_base
+from . import base as rr_trainer_base
 
 
 class RRTrainerDQN(rr_trainer_base.RRTrainerBase):

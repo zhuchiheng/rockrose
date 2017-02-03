@@ -11,7 +11,7 @@ from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD , Adam
 
-import base as rr_model_base
+from . import base as rr_model_base
 
 
 def rr_fn_conv_w_init(shape, name, scl=0.01, *args, **kwargs):

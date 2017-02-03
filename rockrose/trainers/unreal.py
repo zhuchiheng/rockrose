@@ -11,7 +11,7 @@ import threading
 
 import numpy as np
 
-import base as rr_trainer_base
+from . import base as rr_trainer_base
 
 
 class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
@@ -68,7 +68,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
             try:
                 self.model.load(self.model_saved_file_p, self.model_saved_file_v)
             except Exception as e:
-                print e
+                print (e)
 
     def hook_env_render(self):
         if self.if_render:
@@ -172,10 +172,10 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
 
                 if tid == 0:
                     self.lock.acquire()
-                    print '-' * 20, tid, '    ', self.t
-                    print probs
-                    print ' ' * 40, action_index
-                    print 'r_t: ', r_t
+                    print(('-' * 20, tid, '    ', self.t))
+                    print (probs)
+                    print((' ' * 40, action_index))
+                    print(('r_t: ', r_t))
                     self.lock.release()
 
                 # for compute R_t
@@ -211,7 +211,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
                 self.lock.release()
 
             R_batch = np.zeros(t)
-            for i in reversed(range(t_start, t)):
+            for i in reversed(list(range(t_start, t))):
 
                 if term_batch[i]:
                     R_t = 0
@@ -235,9 +235,9 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
             self.lock.acquire()
             loss = self.train_a_batch(t, s_batch, a_batch, R_batch, v_ts, last_a_rs)
             if tid == 0:
-                print '=' * 20, tid, '    ', self.t
-                print 'loss: ', loss
-                print 'v: ', v_ts[-1]
+                print(('=' * 20, tid, '    ', self.t))
+                print(('loss: ', loss))
+                print(('v: ', v_ts[-1]))
                 #print 'term_batch: ', term_batch
                 #print 'past_rewards: ', past_rewards
                 #print 'R_batch: ', R_batch
@@ -248,24 +248,24 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
             if self.use_rp:# and rmem.cnt > self.n_batch * 10:
                 loss = self.train_a_batch_rp(t, rmem)
                 if tid == 0:
-                    print 'rp', '$' * 60
-                    print 'rp loss: ', loss
+                    print(('rp', '$' * 60))
+                    print(('rp loss: ', loss))
             #self.lock.release()
 
             #self.lock.acquire()
             if self.use_vr:# and rmem.cnt > self.n_batch * 10:
                 loss = self.train_a_batch_vr(t, rmem)
                 if tid == 0:
-                    print 'vr', '%' * 60
-                    print 'vr loss: ', loss
+                    print(('vr', '%' * 60))
+                    print(('vr loss: ', loss))
             #self.lock.release()
 
             #self.lock.acquire()
             if self.use_pc:# and rmem.cnt > self.n_batch * 10:
                 loss = self.train_a_batch_pc(t, rmem)
                 if tid == 0:
-                    print 'pc', '^' * 60
-                    print 'pc loss: ', loss
+                    print(('pc', '^' * 60))
+                    print(('pc loss: ', loss))
             self.lock.release()
 
             if self.t > 0 and self.t % self.model_saved_per == 0:
@@ -301,7 +301,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
     def train_a_batch_rp(self, t, rmem):
         minibatch = rmem.sample_zr(4)
         if not minibatch:
-            print 'rp', '#' * 100
+            print(('rp', '#' * 100))
             return
 
         inputs = []
@@ -335,7 +335,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
     def train_a_batch_vr(self, t, rmem):
         minibatch = rmem.sample_sq(self.n_batch)
         if not minibatch:
-            print 'vr', '#' * 100
+            print(('vr', '#' * 100))
             return
 
         s_t = minibatch[-1][0]
@@ -357,7 +357,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
             R_t = self.model.predict_v([s_t, last_a_r])[0][0] # bootstrap from last state
             #self.lock.release()
 
-        for i in reversed(range(0, len(minibatch))):
+        for i in reversed(list(range(0, len(minibatch)))):
             state_t = minibatch[i][0]
             action_t = minibatch[i][1]  # this is action index
             reward_t = minibatch[i][2]
@@ -391,7 +391,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
     def train_a_batch_pc(self, t, rmem):
         minibatch = rmem.sample_sq(self.n_batch)
         if not minibatch:
-            print 'pc', '#' * 100
+            print(('pc', '#' * 100))
             return
 
         s_t = minibatch[-1][0]
@@ -418,7 +418,7 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
             pc_R_t = self.model.predict_pc_q_max([st_b, ar_b])[0] # bootstrap from last state
             #self.lock.release()
 
-        for i in reversed(range(0, len(minibatch))):
+        for i in reversed(list(range(0, len(minibatch)))):
             state_t = minibatch[i][0]
             action_t = minibatch[i][1]  # this is action index
             reward_t = minibatch[i][2]
@@ -485,14 +485,14 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
             try:
                 time.sleep(60)
             except KeyboardInterrupt:
-                print 'xxxxxxxxxxxxx'
+                print ('xxxxxxxxxxxxx')
                 #break
                 self.lock.acquire()
                 self.tg_cfg['flag_stop_by_ctrl_c'] = True
                 self.lock.release()
 
                 for t in self.thrds:
-                    print t
+                    print(t)
                     t.join()
 
                 sys.exit(0)
@@ -522,8 +522,8 @@ class RRTrainerUnreal(rr_trainer_base.RRTrainerBase):
                 action_index = self.sample_policy_action(self.n_actions, probs)
 
                 #print s_t
-                print probs
-                print action_index
+                print(probs)
+                print(action_index)
 
                 x_t1_colored, r_t, terminal, info = self.env.step(action_index)
                 s_t1 = self.prepr.process(x_t1_colored, s_t)

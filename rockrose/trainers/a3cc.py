@@ -11,7 +11,7 @@ import threading
 
 import numpy as np
 
-import base as rr_trainer_base
+import rockrose.trainers.base as rr_trainer_base
 
 
 class RRTrainerA3C(rr_trainer_base.RRTrainerBase):
@@ -63,7 +63,7 @@ class RRTrainerA3C(rr_trainer_base.RRTrainerBase):
                 self.model.load(self.model_saved_file_p,
                                 self.model_saved_file_v)
             except Exception as e:
-                print e
+                print (e)
 
 
     def hook_env_render(self):
@@ -154,10 +154,10 @@ class RRTrainerA3C(rr_trainer_base.RRTrainerBase):
 
                 if tid == 0:
                     self.lock.acquire()
-                    print '-' * 20, tid, '    ', self.t
-                    print probs
-                    print ' ' * 40, action_index
-                    print 'r_t: ', r_t
+                    print ('-' * 20, tid, '    ', self.t)
+                    print (probs)
+                    print (' ' * 40, action_index)
+                    print ('r_t: ', r_t)
                     self.lock.release()
 
                 # for compute R_t
@@ -209,9 +209,9 @@ class RRTrainerA3C(rr_trainer_base.RRTrainerBase):
             #self.lock.acquire()
             loss = self.train_a_batch(t, s_batch, a_batch, R_batch, v_ts)
             if tid == 0:
-                print '=' * 20, tid, '    ', self.t
-                print 'loss: ', loss
-                print 'v: ', v_ts[-1]
+                print ('=' * 20, tid, '    ', self.t)
+                print ('loss: ', loss)
+                print ('v: ', v_ts[-1])
                 #print 'term_batch: ', term_batch
                 #print 'past_rewards: ', past_rewards
                 #print 'R_batch: ', R_batch
@@ -260,14 +260,14 @@ class RRTrainerA3C(rr_trainer_base.RRTrainerBase):
             try:
                 time.sleep(60)
             except KeyboardInterrupt:
-                print 'xxxxxxxxxxxxx'
+                print ('xxxxxxxxxxxxx')
                 #break
                 self.lock.acquire()
                 self.tg_cfg['flag_stop_by_ctrl_c'] = True
                 self.lock.release()
 
                 for t in self.thrds:
-                    print t
+                    print (t)
                     t.join()
 
                 sys.exit(0)
@@ -290,8 +290,8 @@ class RRTrainerA3C(rr_trainer_base.RRTrainerBase):
                 action_index = self.sample_policy_action(self.n_actions, probs)
 
                 #print s_t
-                print probs
-                print action_index
+                print (probs)
+                print (action_index)
 
                 x_t1_colored, r_t, terminal, info = self.env.step(action_index)
                 s_t1 = self.prepr.process(x_t1_colored, s_t)

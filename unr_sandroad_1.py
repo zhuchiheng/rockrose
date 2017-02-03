@@ -75,10 +75,10 @@ def main():
     md_cfg = {
         'input_shape': (4, 84, 84),
         #'input_shape': (4, 72, 72),
-        'pc_wh': 84 / 4,
+        'pc_wh': int(84 / 4),
         'actn': actn,
         'lr': 1e-3,  #1e-4  #1e-5,  # 1e-6
-        'pc_wh': 84 / 4,
+        'pc_wh': int(84 / 4),
         'pc_cw': 11,
         'pc_lambda': 0.0001, #1.0,
     }
@@ -96,7 +96,7 @@ def main():
         'use_rp': True,
         'use_vr': True,
         'use_pc': True,
-        'pc_wh': 84 / 4,
+        'pc_wh': int(84 / 4),
     }
     if 1:
         trnr = rr_trainer_unr.RRTrainerUnreal(trnr_cfg, envs, model, prepr, rmem)

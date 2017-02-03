@@ -23,7 +23,7 @@ from keras.optimizers import SGD , Adam
 
 from keras import backend as K
 
-import base as rr_model_base
+from . import base as rr_model_base
 
 
 def rr_fn_conv_w_init(shape, name, scl=0.01, *args, **kwargs):
