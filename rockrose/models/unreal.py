@@ -7,12 +7,13 @@ import random
 
 import numpy as np
 
-from keras import initializations
-from keras.initializations import normal, identity
+#from keras import initializations
+from keras.initializers import normal, identity
+#from keras.initializations import normal, identity
 from keras.models import model_from_json
 from keras.models import Sequential
 from keras.models import Model
-from keras.engine.topology import Merge
+from keras.layers import Merge
 from keras.layers import merge, Lambda
 from keras.layers import Convolution2D, Deconvolution2D
 from keras.layers import Flatten, Dense, Input
@@ -23,7 +24,7 @@ from keras.optimizers import SGD , Adam
 
 from keras import backend as K
 
-from . import base as rr_model_base
+import rockrose.models.base as rr_model_base
 
 
 def rr_fn_conv_w_init(shape, name, scl=0.01, *args, **kwargs):
@@ -99,8 +100,8 @@ class RRModelUnreal(rr_model_base.RRModelBase):
         act_n = self.actn
         rp_n = self.rp_n
         batch_n = self.batch_n
-        pc_wh = self.pc_wh
-        pc_cw = self.pc_cw
+        pc_wh = int(self.pc_wh)
+        pc_cw = int(self.pc_cw)
 
 
         #in_img = Input(shape=self.input_shape)
@@ -175,10 +176,11 @@ class RRModelUnreal(rr_model_base.RRModelBase):
 
 
         pc_deconv_a_model = Sequential(name='pc_deconv_a_model')
-        pc_deconv_a_model.add(pc_fc_model)
-        pc_deconv_a_model.add(Deconvolution2D(act_n, 4, 4,
-            output_shape=(batch_n, act_n, pc_wh, pc_wh),
-            #input_shape=(32, pc_cw, pc_cw),
+        pc_deconv_a_model.add(pc_fc_model) # (32, 11, 11)
+        # Dimensions must be equal, but are 21 and 2 for 'add_13' (op: 'Add') with input shapes: [32,2,21,21], [1,1,1,2].
+        pc_deconv_a_model.add(Deconvolution2D(act_n, 4, 4, # 2, 4, 4
+            output_shape=(batch_n, act_n, pc_wh, pc_wh), # 32, 2, 21, 21
+            #input_shape=(32, pc_cw, pc_cw), # 32, 11, 11
             subsample=(2, 2),
             init=rr_fn_conv_w_init,
             border_mode='same',
@@ -189,7 +191,7 @@ class RRModelUnreal(rr_model_base.RRModelBase):
         pc_deconv_a_mean_model.add(Merge([pc_deconv_a_model, pc_deconv_a_model],
                                          mode=kr_merge_fn_mean,
                                          arguments={'axis': 1},
-                                         output_shape=(1, pc_wh, pc_wh),
+                                         output_shape=(1, pc_wh, pc_wh), # 1, 21, 21
                                          name='mg_pc_deconv_a_mean'))
 
 
@@ -376,7 +378,7 @@ class RRModelUnreal(rr_model_base.RRModelBase):
         ......
         ValueError: Tensor Tensor("Softmax:0", shape=(?, 5), dtype=float32) is not an element of this graph.
 
-        >>> https://github.com/fchollet/keras/issues/2397
+        # https://github.com/fchollet/keras/issues/2397
         """
 
         if K._BACKEND == 'tensorflow':

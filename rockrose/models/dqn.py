@@ -3,15 +3,16 @@
 
 import json
 
-from keras import initializations
-from keras.initializations import normal, identity
+#from keras import initializations
+from keras.initializers import normal, identity
+#from keras.initializations import normal, identity
 from keras.models import model_from_json
 from keras.models import Sequential
 from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.optimizers import SGD , Adam
 
-from . import base as rr_model_base
+import base as rr_model_base
 
 
 def rr_fn_conv_w_init(shape, name, scl=0.01, *args, **kwargs):

@@ -6,9 +6,7 @@ import random
 import time
 
 from collections import namedtuple, deque, OrderedDict
-# import cPickle as pickle
 import pickle
-
 
 class ReplayMemory(object):
     def __init__(self, mem_max=10000):
